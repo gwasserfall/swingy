@@ -170,7 +170,7 @@ public class ConsoleView {
         }
 
         if (Game.CheckForLevelUp()) {
-            levelUp();
+            LevelUp();
         }
 
 
