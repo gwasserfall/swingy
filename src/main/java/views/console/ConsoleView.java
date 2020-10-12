@@ -207,6 +207,16 @@ public class ConsoleView {
     public void LevelUp() {
         Swingy.state.currentScreen = "level_up";
 
+        System.out.println("You have leveled up! Well Done :)");
+        System.out.println("Name : " + Swingy.state.player.name);
+        System.out.println("Class : " + Swingy.state.player.cls);
+        System.out.println("Level : " + Swingy.state.player.level);
+        System.out.println("Attack : " + Swingy.state.player.attack);
+        System.out.println("Defence : " + Swingy.state.player.defence);
+        System.out.println("Experience : " + Swingy.state.player.exp);
+
+        GetUserInput("Press enter to continue");
+
     }
 
     public void Encounter() {
@@ -226,6 +236,7 @@ public class ConsoleView {
         } else if (selection.equalsIgnoreCase("2")) {
             if (Game.TryEscape()) {
                 info.add("Successfully escaped encounter");
+                Swingy.state.currentScreen = "escaped";
                 GameLoop();
             } else {
                 errors.add("Could not escape, must fight!");

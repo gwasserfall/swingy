@@ -59,6 +59,8 @@ public class Game {
 
         Swingy.state.player.attackLog.clear();
 
+        player.hp = 100;
+
         player.attackLog.add("Fight Started!");
 
         while (true) {
@@ -69,17 +71,23 @@ public class Game {
             player.attackLog.add(String.format("You hit enemy for %d", playerAttackValue));
 
             if (enemy.hp <= 0) {
-                break;
+                player.exp += ((int) (player.level * 1000 + Math.pow(player.level - 1, 2) * 450)) / 3;
+                player.hp = 100;
+                return true;
             }
 
             player.hp -= enemyAttackValue;
             player.attackLog.add(String.format("Enemy hit you for %d", enemyAttackValue));
 
-            if (enemy.hp <= 0) {
-                break;
+            if (player.hp <= 0) {
+                ResetPlayerAfterLoss();
+                return false;
             }
         }
-        return (player.hp > 0);
+    }
+
+    public static void ResetPlayerAfterLoss() {
+
     }
 
     public static ArrayList<String> ReadAttackLog() {
@@ -135,7 +143,9 @@ public class Game {
     }
 
     public static Boolean CheckForEndOfMap() {
+        Hero player = Swingy.state.player;
         if (Swingy.state.map.EdgeDectect(Swingy.state.player)) {
+            player.exp = ((int) (player.level * 1000 + Math.pow(player.level - 1, 2) * 450)) / 2;
             PlaceHeroOnNewMap(Swingy.state.player);
             return true;
         }
@@ -145,10 +155,10 @@ public class Game {
     public static Boolean CheckForLevelUp() {
         Hero player = Swingy.state.player;
 
-        Integer level = (int) (player.level * 1000 + Math.pow(player.level, 2) * 450);
+        Integer level = (int) (player.level * 1000 + Math.pow(player.level - 1, 2) * 450);
 
-        if (level >= player.level) {
-            player.level = level;
+        if (player.exp >= level) {
+            player.level++;
             return true;
         }
         return false;
