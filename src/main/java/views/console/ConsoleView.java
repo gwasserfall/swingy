@@ -154,44 +154,45 @@ public class ConsoleView {
     public void EndOfMap() {
         System.out.println("You have reached the end of this map");
         GetUserInput("Press enter to continue");
+        GameLoop();
     }
 
     public void GameLoop() {
         Boolean encounter = true;
         Swingy.state.currentScreen = "game_loop";
-
         ClearScreen();
 
         Game.SaveGameToDatabase();
 
-        // Check for level finish
-        if (Game.CheckForEndOfMap()) {
-            EndOfMap();
-        }
-
-        if (Game.CheckForLevelUp()) {
-            LevelUp();
-        }
-
-
+        if (Game.CheckForEndOfMap()) EndOfMap();
+        if (Game.CheckForLevelUp()) LevelUp();
 
         System.out.print(String.format("You are at position [%d,%d]", Swingy.state.player.x, Swingy.state.player.y));
         System.out.println(String.format(" on a (%d x %d) map", Swingy.state.map.width, Swingy.state.map.height));
-        System.out.println("Which direction would you like to move? [N, E, S, W]");
+        System.out.println("Which direction would you like to move?");
         System.out.println("");
+        System.out.println("1) North");
+        System.out.println("2) East");
+        System.out.println("3) South");
+        System.out.println("4) West");
+        System.out.println("5) Show player stats");
 
         String selection = GetUserInput("Selection : ");
 
-        if (selection.equalsIgnoreCase("n")) {
+        if (selection.equalsIgnoreCase("1")) {
             encounter = Game.MovePlayerUpAndCheckForEncounter();
-        } else if (selection.equalsIgnoreCase("e")) {
+        } else if (selection.equalsIgnoreCase("2")) {
             encounter = Game.MovePlayerRightAndCheckForEncounter();
-        } else if (selection.equalsIgnoreCase("s")) {
+        } else if (selection.equalsIgnoreCase("3")) {
             encounter = Game.MovePlayerDownAndCheckForEncounter();
-        } else if (selection.equalsIgnoreCase("w")) {
+        } else if (selection.equalsIgnoreCase("4")) {
             encounter = Game.MovePlayerLeftAndCheckForEncounter();
-        }
-        else {
+        } else if (selection.equalsIgnoreCase("5")) {
+            ClearScreen();
+            PrintStats();
+            GetUserInput("Press enter to continue");
+            GameLoop();
+        } else {
             errors.add(String.format("Incorrect selection"));
             GameLoop();
         }
@@ -204,19 +205,24 @@ public class ConsoleView {
         }
     }
 
+    public void PrintStats() {
+        System.out.println("Player stats");
+        System.out.println("");
+        System.out.println("Name       : " + Swingy.state.player.name);
+        System.out.println("Class      : " + Swingy.state.player.cls);
+        System.out.println("Level      : " + Swingy.state.player.level);
+        System.out.println("Attack     : " + Swingy.state.player.attack);
+        System.out.println("Defence    : " + Swingy.state.player.defence);
+        System.out.println("Experience : " + Swingy.state.player.exp);
+    }
+
     public void LevelUp() {
         Swingy.state.currentScreen = "level_up";
 
         System.out.println("You have leveled up! Well Done :)");
-        System.out.println("Name : " + Swingy.state.player.name);
-        System.out.println("Class : " + Swingy.state.player.cls);
-        System.out.println("Level : " + Swingy.state.player.level);
-        System.out.println("Attack : " + Swingy.state.player.attack);
-        System.out.println("Defence : " + Swingy.state.player.defence);
-        System.out.println("Experience : " + Swingy.state.player.exp);
+        PrintStats();
 
         GetUserInput("Press enter to continue");
-
     }
 
     public void Encounter() {
@@ -257,18 +263,49 @@ public class ConsoleView {
         (Game.ReadAttackLog()).forEach(entry -> System.out.println(entry));
 
         if (fightWon) {
-            info.add("You won the fight!");
+            if (Game.CheckForPowerUp()) {
+                PowerUpObtained();
+            }
         } else {
-
+            FightHasBeenLost();
         }
 
         GetUserInput("Press enter to continue");
         GameLoop();
     }
 
-    public void FightHasBeenWon() {
+    public void PowerUpObtained() {
+        ClearScreen();
+        Swingy.state.currentScreen = "powerup";
+        System.out.println("The enemy dropped an artifact");
+        System.out.println(String.format("Name      : %s",  Swingy.state.currentPowerUp.name));
+        System.out.println(String.format("Type      : %s",  Swingy.state.currentPowerUp.typeOfPowerUp));
+        System.out.println(String.format("Attack    : +%d", Swingy.state.currentPowerUp.attack));
+        System.out.println(String.format("Defence   : +%d", Swingy.state.currentPowerUp.defence));
+        System.out.println(String.format("HP        : +%d", Swingy.state.currentPowerUp.hp));
+        System.out.println("");
+        System.out.println("1) Keep it");
+        System.out.println("2) Move on");
 
+        String selection = GetUserInput("Selection : ");
+
+        if (selection.equalsIgnoreCase("1")) {
+            Game.ApplyPowerUp();
+            GameLoop();
+        } else if (selection.equalsIgnoreCase("2")) {
+            GameLoop();
+        } else {
+            errors.add("Incorrect selection");
+            PowerUpObtained();
+        }
     }
 
-    public void FightHasBeenLost() {}
+    public void FightHasBeenLost() {
+        System.out.println("GAME OVER!");
+        System.out.println("Your character will be reset to level 0");
+
+        String selection = GetUserInput("Press enter to go back to the main menu");
+
+        MainMenu();
+    }
 }

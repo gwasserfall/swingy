@@ -1,9 +1,6 @@
 package controllers;
 
-import models.Enemy;
-import models.GameState;
-import models.Hero;
-import models.Map;
+import models.*;
 import models.classes.*;
 import swingy.Swingy;
 
@@ -56,10 +53,9 @@ public class Game {
         Enemy enemy = new Enemy(player);
         Integer playerAttackValue;
         Integer enemyAttackValue;
+        Integer playerOriginalHp = player.hp;
 
         Swingy.state.player.attackLog.clear();
-
-        player.hp = 100;
 
         player.attackLog.add("Fight Started!");
 
@@ -73,6 +69,8 @@ public class Game {
             if (enemy.hp <= 0) {
                 player.exp += ((int) (player.level * 1000 + Math.pow(player.level - 1, 2) * 450)) / 3;
                 player.hp = 100;
+                player.attackLog.add("You win!");
+                player.hp = playerOriginalHp;
                 return true;
             }
 
@@ -80,6 +78,7 @@ public class Game {
             player.attackLog.add(String.format("Enemy hit you for %d", enemyAttackValue));
 
             if (player.hp <= 0) {
+                player.attackLog.add("You lost the fight :(");
                 ResetPlayerAfterLoss();
                 return false;
             }
@@ -87,15 +86,14 @@ public class Game {
     }
 
     public static void ResetPlayerAfterLoss() {
-
+        String currentPlayerName = Swingy.state.player.name;
+        String currentPlayerClass = Swingy.state.player.cls;
+        CreateNewHero(currentPlayerClass);
     }
 
     public static ArrayList<String> ReadAttackLog() {
 
         ArrayList<String> temp = new ArrayList<String>(Swingy.state.player.attackLog);
-
-//        Swingy.state.player.attackLog.clear();
-
         return temp;
     }
 
@@ -159,8 +157,29 @@ public class Game {
 
         if (player.exp >= level) {
             player.level++;
+            player.attack += 2;
+            player.defence += 5;
+            player.hp += 10;
             return true;
         }
         return false;
+    }
+
+    public static Boolean CheckForPowerUp() {
+        if (RandomInt(0, 2) == 0) {
+            Swingy.state.currentPowerUp = new PowerUp(Swingy.state.player);
+            return true;
+        }
+        return false;
+    }
+
+    public static void ApplyPowerUp() {
+        Hero player = Swingy.state.player;
+        PowerUp powerUp = Swingy.state.currentPowerUp;
+        if (powerUp != null) {
+            player.attack += powerUp.attack;
+            player.defence += powerUp.defence;
+            player.hp += powerUp.hp;
+        }
     }
 }

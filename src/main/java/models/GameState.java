@@ -10,6 +10,8 @@ public class GameState implements Serializable {
     public Boolean gameStarted = false;
     public Map map;
     public Boolean fightWon = false;
+    public PowerUp currentPowerUp = null;
+    public Enemy currentEnemy = null;
 
     public GameState() { }
 
