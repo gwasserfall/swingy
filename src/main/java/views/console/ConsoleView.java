@@ -40,6 +40,7 @@ public class ConsoleView {
             System.out.println("Thanks for playing! Goodbye.");
             System.exit(0);
         }
+
         return selection;
     }
 
@@ -48,7 +49,7 @@ public class ConsoleView {
 
         Swingy.state.currentScreen = "main_menu";
         System.out.println("Welcome to Swingy");
-        System.out.println("Tye \"q\" or \"quit\" at anytime to exit");
+        System.out.println("Type \"q\" or \"quit\" at anytime to exit");
         System.out.println(" ");
         System.out.println("1) Create a new hero");
         System.out.println("2) Select existing hero");

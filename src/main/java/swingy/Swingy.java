@@ -42,6 +42,9 @@ public class Swingy {
             if (display == "console") {
                 new ConsoleView();
             }
+            if (display == "gui") {
+                new ConsoleView();
+            }
         }
 
     }
@@ -55,7 +58,6 @@ public class Swingy {
 
         // Create validator
         validator = Validation.buildDefaultValidatorFactory().getValidator();
-
     }
 }
 
